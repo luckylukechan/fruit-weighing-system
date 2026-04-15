@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>管理员后台</title>
+    <style>
+        body {
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+            padding: 20px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #f4f6f8;
+        }
+
+        input {
+            width: 80px;
+            text-align: center;
+        }
+
+        button {
+            padding: 6px 12px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<h2>水果价格管理</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>类别ID</th>
+            <th>水果名称</th>
+            <th>单价（元/kg）</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for fruit in fruits %}
+        <tr>
+            <td>{{ fruit.class }}</td>
+            <td>{{ fruit.name }}</td>
+            <td>
+                <input type="number"
+                       value="{{ fruit.price }}"
+                       data-old="{{ fruit.price }}"
+                       oninput="onPriceChange(this)">
+            </td>
+            <td>
+                <button disabled onclick="submitPrice(this, {{ fruit.class }})">
+                    修改
+                </button>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<br>
+<a href="/admin/menu">返回</a>
+    <script>
+    function onPriceChange(input) {
+        const oldPrice = input.dataset.old;
+        const newPrice = input.value;
+        const btn = input.parentElement.nextElementSibling.querySelector("button");
+
+        if (newPrice !== oldPrice) {
+            btn.disabled = false;
+            btn.style.backgroundColor = "#409eff";
+            btn.style.color = "white";
+        } else {
+            btn.disabled = true;
+            btn.style.backgroundColor = "";
+            btn.style.color = "";
+        }
+    }
+
+    function submitPrice(btn, classId) {
+        const input = btn.parentElement.previousElementSibling.querySelector("input");
+        const newPrice = input.value;
+
+        fetch("/admin/update_price", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+                class: classId,
+                price: newPrice
+            })
+        }).then(res => res.json())
+          .then(data => {
+              if (data.status === "ok") {
+                  input.dataset.old = newPrice;
+                  btn.disabled = true;
+                  btn.style.backgroundColor = "";
+                  btn.style.color = "";
+                  alert("价格修改成功");
+              }
+          });
+    }
+    </script>
+</body>
+</html>

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>交易数据查询</title>
+    <style>
+        body {
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f6fa;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h2, h3 {
+            color: #2f3640;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        select {
+            padding: 5px 10px;
+            font-size: 14px;
+            border-radius: 5px;
+            border: 1px solid #dcdde1;
+        }
+
+        button {
+            padding: 5px 12px;
+            margin-left: 5px;
+            background-color: #40739e;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        button:hover {
+            background-color: #2f3640;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: center;
+            border-bottom: 1px solid #dcdde1;
+        }
+
+        th {
+            background-color: #40739e;
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f1f2f6;
+        }
+
+        a {
+            text-decoration: none;
+            color: #40739e;
+            margin: 0 10px;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        #pagination {
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        #detail-body td {
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+<h2>交易数据查询</h2>
+
+<!-- 筛选 -->
+<form method="get" action="/admin/data">
+    <select name="status">
+        <option value="all" {% if status=='all' %}selected{% endif %}>全部</option>
+        <option value="Success" {% if status=='Success' %}selected{% endif %}>成功</option>
+        <option value="Cancel" {% if status=='Cancel' %}selected{% endif %}>取消</option>
+        <option value="Timeout" {% if status=='Timeout' %}selected{% endif %}>超时</option>
+    </select>
+    <button type="submit">筛选</button>
+</form>
+
+<!-- 交易表 -->
+<table>
+    <tr>
+        <th>时间</th>
+        <th>总价</th>
+        <th>状态</th>
+        <th>操作</th>
+    </tr>
+
+    {% for t in transactions %}
+    <tr>
+        <td>{{ t.time }}</td>
+        <td>{{ t.total }}</td>
+        <td>{{ t.status }}</td>
+        <td>
+            <button onclick="loadDetail({{ t.session }})">查看详情</button>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+<!-- 分页 -->
+<div id="pagination">
+    {% if page > 1 %}
+        <a href="/admin/data?page={{ page-1 }}&status={{ status }}">« 上一页</a>
+    {% endif %}
+
+    第 {{ page }} 页
+
+    {% if transactions|length == PAGE_SIZE %}
+        <a href="/admin/data?page={{ page+1 }}&status={{ status }}">下一页 »</a>
+    {% endif %}
+</div>
+
+<hr>
+
+<h3>交易详情</h3>
+<table>
+    <tr>
+        <th>名称</th>
+        <th>重量</th>
+        <th>单价</th>
+    </tr>
+    <tbody id="detail-body">
+    </tbody>
+</table>
+
+<a href="/admin/menu">返回菜单</a>
+
+<script>
+function loadDetail(session_id) {
+    fetch('/admin/data/detail?session=' + session_id)
+        .then(res => res.json())
+        .then(data => {
+            let tbody = document.getElementById("detail-body");
+            tbody.innerHTML = "";
+
+            data.forEach(item => {
+                let row = `<tr>
+                    <td>${item.name}</td>
+                    <td>${item.weight}</td>
+                    <td>${item.price}</td>
+                </tr>`;
+                tbody.innerHTML += row;
+            });
+        });
+}
+</script>
+
+</body>
+</html>

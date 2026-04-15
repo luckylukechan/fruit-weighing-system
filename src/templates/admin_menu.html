@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh">
+<html>
+<head>
+    <title>管理操作选择</title>
+    <style>
+        body { font-family: Arial; text-align: center; background: #f5f5f5; }
+        .container {
+            margin: 100px auto;
+            width: 400px;
+            padding: 30px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h2 { margin-bottom: 30px; }
+        .btn {
+            display: block;
+            width: 200px;
+            margin: 15px auto;
+            padding: 12px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            color: white;
+        }
+        .price { background-color: #2ecc71; }
+        .query { background-color: #3498db; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>基于YOLO11的水果识别智能称重系统</h2>
+    <button class="btn price" onclick="location.href='/admin/price'">价格修改</button>
+    <button class="btn query" onclick="location.href='/admin/data'">数据查询</button>
+    <button onclick="location.href='/logout'">退出登录</button>
+</div>
+</body>
+</html>
